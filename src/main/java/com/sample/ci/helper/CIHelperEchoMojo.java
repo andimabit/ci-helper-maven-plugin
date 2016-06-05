@@ -30,9 +30,8 @@ import org.apache.maven.project.MavenProjectHelper;
 import com.sample.ci.helper.model.SkipWhen;
 
 /**
- * Goal which touches a timestamp file.
  */
-@Mojo(name = "echo", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
+@Mojo(name = "echo", defaultPhase = LifecyclePhase.VALIDATE)
 public class CIHelperEchoMojo extends AbstractMojo {
 
 	/**
@@ -55,11 +54,15 @@ public class CIHelperEchoMojo extends AbstractMojo {
 
 	@Parameter(property = "useLog", required = false, defaultValue = "false")
 	protected String useLog;
+	
+	protected SkipWhenHelper skipHelper = new SkipWhenHelper();
 
 	public void execute() throws MojoExecutionException {
+		this.skipHelper.usingLog(getLog()).forProject(this.project).forSkipWhen(this.skipWhen);
+		
 		getLog().debug("skipWen configuration: " + Objects.toString(this.skipWhen));
 
-		if (this.skipWhenMet()) {
+		if (this.skipHelper.skipWhenMet()) {
 			getLog().info("skipping execution according to skipWhen condition(s)");
 			return;
 		}
@@ -69,19 +72,6 @@ public class CIHelperEchoMojo extends AbstractMojo {
 		} else {
 			System.out.println(this.message);
 		}
-	}
-
-	protected boolean skipWhenMet() {
-		if (this.skipWhen == null) {
-			return false;
-		}
-
-		if (new SkipWhenHelper(this.skipWhen, this.project, getLog()).skipWhenMet()) {
-			return true;
-		}
-
-		return false;
-
 	}
 
 }

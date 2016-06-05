@@ -2,6 +2,20 @@ package com.sample.ci.helper.model;
 
 public class SkipWhen {
 
+	public static final String BOOLEAN_OPERATOR_OR = "or";
+
+	public static final String BOOLEAN_OPERATOR_AND = "and";
+
+	public static boolean isBooleanOperatorValid(String operator) {
+		switch (operator) {
+		case BOOLEAN_OPERATOR_AND:
+		case BOOLEAN_OPERATOR_OR:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	private String packagingEquals;
 
 	private String groupIdEquals;
@@ -17,6 +31,8 @@ public class SkipWhen {
 	private String activeProfileIdEquals;
 
 	private String artifactEquals;
+
+	private String booleanOperator = BOOLEAN_OPERATOR_OR;
 
 	public SkipWhen withPackagingEquals(String packagingEquals) {
 		this.packagingEquals = packagingEquals;
@@ -58,6 +74,15 @@ public class SkipWhen {
 		return this;
 	}
 
+	public SkipWhen useBooleanOperator(String booleanOperator) {
+		if (!isBooleanOperatorValid(booleanOperator)) {
+			throw new IllegalArgumentException(
+					"booleanOperator '" + booleanOperator + "' not valid, must be one of: 'and', 'or'");
+		}
+		this.booleanOperator = booleanOperator;
+		return this;
+	}
+
 	public String getPackagingEquals() {
 		return packagingEquals;
 	}
@@ -90,11 +115,17 @@ public class SkipWhen {
 		return artifactEquals;
 	}
 
+	public String getBooleanOperator() {
+		return booleanOperator;
+	}
+
 	@Override
 	public String toString() {
 		// avoid noise: let's print only what differs from null
 		StringBuilder buf = new StringBuilder();
-		buf.append("{ ");
+		buf.append("{ booleanOperator=");
+		buf.append(this.booleanOperator);
+		buf.append(", ");
 		if (this.packagingEquals != null) {
 			buf.append("packagingEquals=");
 			buf.append(this.packagingEquals);

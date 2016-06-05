@@ -14,12 +14,12 @@ import com.sample.ci.helper.model.SkipWhen;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SkipWhenHelperTest {
-	
+
 	private SkipWhenHelper helper;
-	
+
 	@Mock
 	private MavenProject project;
-	
+
 	@Mock
 	private Log log;
 
@@ -27,32 +27,36 @@ public class SkipWhenHelperTest {
 	public void setUp() {
 		this.helper = new SkipWhenHelper().forProject(this.project);
 	}
-	
+
 	@Test
 	public void testWhenPackagingMatch() {
 		Mockito.when(this.project.getPackaging()).thenReturn("pom");
-		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("pom");
+		Mockito.when(this.project.getGroupId()).thenReturn("com.sample");
 		
+		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("pom").withGroupIdEquals("com.sample");
+		Assert.assertTrue(this.helper.forSkipWhen(skipWhen).skipWhenMet());
+		
+		skipWhen.useBooleanOperator(SkipWhen.BOOLEAN_OPERATOR_AND);
 		Assert.assertTrue(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 	}
-	
+
 	@Test
 	public void testWhenPackagingNotMatching() {
 		Mockito.when(this.project.getPackaging()).thenReturn("pom");
-		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("jar");
-		
+		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("jar").useBooleanOperator(SkipWhen.BOOLEAN_OPERATOR_OR);
+
 		Assert.assertFalse(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 	}
-	
+
 	@Test
 	public void testWhenPackagingNegateMatching() {
 		Mockito.when(this.project.getPackaging()).thenReturn("pom");
-		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("!pom");
-		
+		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("!pom").useBooleanOperator(SkipWhen.BOOLEAN_OPERATOR_OR);
+
 		Assert.assertFalse(this.helper.forSkipWhen(skipWhen).skipWhenMet());
-		
+
 		Mockito.when(this.project.getPackaging()).thenReturn("jar");
 		Assert.assertTrue(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 	}
-	
+
 }

@@ -1,5 +1,8 @@
 package com.sample.ci.helper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
@@ -42,34 +45,35 @@ public class SkipWhenHelper {
 			return false;
 		}
 
-		boolean skip = checkSingleValue(this.skipWhen.getPackagingEquals(), this.project.getPackaging(),
-				"packagingEquals", "packaging");
-		if (skip) {
-			return true;
+		List<Boolean> skipList = new ArrayList<>(8);
+		
+		skipList.add(checkSingleValue(this.skipWhen.getPackagingEquals(), this.project.getPackaging(),
+				"packagingEquals", "packaging"));
+		skipList.add(checkSingleValue(this.skipWhen.getGroupIdEquals(), this.project.getGroupId(), "groupIdEquals",
+				"groupId"));
+		skipList.add(checkSingleValue(this.skipWhen.getArtifactIdEquals(), this.project.getArtifactId(), "artifactIdEquals",
+				"artifactId"));
+		skipList.add(checkSingleValue(this.skipWhen.getVersionEquals(), this.project.getVersion(), "versionEquals",
+				"version"));
+		
+		boolean result = false;
+		if (SkipWhen.BOOLEAN_OPERATOR_AND.equals(this.skipWhen.getBooleanOperator())) {
+			for (Boolean b : skipList) {
+				result = result && b;
+			}
+		} else {
+			for (Boolean b : skipList) {
+				result = result || b;
+			}
 		}
-		skip = checkSingleValue(this.skipWhen.getGroupIdEquals(), this.project.getGroupId(), "groupIdEquals",
-				"groupId");
-		if (skip) {
-			return true;
-		}
-		skip = checkSingleValue(this.skipWhen.getArtifactIdEquals(), this.project.getArtifactId(), "artifactIdEquals",
-				"artifactId");
-		if (skip) {
-			return true;
-		}
-		skip = checkSingleValue(this.skipWhen.getVersionEquals(), this.project.getVersion(), "versionEquals",
-				"version");
-		if (skip) {
-			return true;
-		}
+		
 		/*
 		 * TODO <classifierEquals>something</classifierEquals>
 		 * <noTestsFound>false</noTestsFound>
 		 * <activeProfileIdEquals>profile-id</activeProfileIdEquals>
 		 */
 
-		return false;
-
+		return result;
 	}
 
 	public boolean checkSingleValue(String configurationEntry, String projectProperty, String configurationEntryName,

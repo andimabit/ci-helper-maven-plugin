@@ -38,6 +38,7 @@
 								<classifierEquals>something</classifierEquals>
 								<noTestsFound>false</noTestsFound>
 								<activeProfileIdEquals>profile-id</activeProfileIdEquals>
+								<booleanOperator>or</booleanOperator>
 							</skipWhen>
 						</configuration>
 					</execution>
