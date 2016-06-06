@@ -2,17 +2,22 @@ package com.sample.ci.helper.model;
 
 public class SkipWhen {
 
-	public static final String BOOLEAN_OPERATOR_OR = "or";
+	public enum BooleanOperator {
+		OR, AND;
 
-	public static final String BOOLEAN_OPERATOR_AND = "and";
-
-	public static boolean isBooleanOperatorValid(String operator) {
-		switch (operator) {
-		case BOOLEAN_OPERATOR_AND:
-		case BOOLEAN_OPERATOR_OR:
-			return true;
-		default:
+		public static boolean isBooleanOperatorValid(String operator) {
+			if (OR.name().equalsIgnoreCase(operator) || AND.name().equalsIgnoreCase(operator)) {
+				return true;
+			}
 			return false;
+		}
+
+		public static boolean isOr(String operator) {
+			return OR.name().equalsIgnoreCase(operator);
+		}
+		
+		public static boolean isAnd(String operator) {
+			return AND.name().equalsIgnoreCase(operator);
 		}
 	}
 
@@ -32,7 +37,7 @@ public class SkipWhen {
 
 	private String artifactEquals;
 
-	private String booleanOperator = BOOLEAN_OPERATOR_OR;
+	private String booleanOperator = BooleanOperator.OR.name();
 
 	public SkipWhen withPackagingEquals(String packagingEquals) {
 		this.packagingEquals = packagingEquals;
@@ -74,8 +79,12 @@ public class SkipWhen {
 		return this;
 	}
 
+	public SkipWhen useBooleanOperator(BooleanOperator operator) {
+		return this.useBooleanOperator(operator.name());
+	}
+
 	public SkipWhen useBooleanOperator(String booleanOperator) {
-		if (!isBooleanOperatorValid(booleanOperator)) {
+		if (!BooleanOperator.isBooleanOperatorValid(booleanOperator)) {
 			throw new IllegalArgumentException(
 					"booleanOperator '" + booleanOperator + "' not valid, must be one of: 'and', 'or'");
 		}
@@ -122,54 +131,33 @@ public class SkipWhen {
 	@Override
 	public String toString() {
 		// avoid noise: let's print only what differs from null
-		StringBuilder buf = new StringBuilder();
-		buf.append("{ booleanOperator=");
-		buf.append(this.booleanOperator);
-		buf.append(", ");
-		if (this.packagingEquals != null) {
-			buf.append("packagingEquals=");
-			buf.append(this.packagingEquals);
-			buf.append(", ");
-		}
-		if (this.artifactIdEquals != null) {
-			buf.append("artifactIdEquals=");
-			buf.append(this.artifactIdEquals);
-			buf.append(", ");
-		}
-		if (this.groupIdEquals != null) {
-			buf.append("groupIdEquals=");
-			buf.append(this.groupIdEquals);
-			buf.append(", ");
-		}
-		if (this.versionEquals != null) {
-			buf.append("versionEquals=");
-			buf.append(this.versionEquals);
-			buf.append(", ");
-		}
-		if (this.classifierEquals != null) {
-			buf.append("classifierEquals=");
-			buf.append(this.classifierEquals);
-			buf.append(", ");
-		}
-		if (this.noTestsFound != null) {
-			buf.append("noTestsFound=");
-			buf.append(this.noTestsFound);
-			buf.append(", ");
-		}
-		if (this.activeProfileIdEquals != null) {
-			buf.append("activeProfileIdEquals=");
-			buf.append(this.activeProfileIdEquals);
-			buf.append(", ");
-		}
-		if (this.artifactEquals != null) {
-			buf.append("artifactEquals=");
-			buf.append(this.artifactEquals);
-		}
+		StringBuilder buf = new StringBuilder("{");
+		
+		toStringHelper(buf, "booleanOperator", this.booleanOperator, true);
+		toStringHelper(buf, "packagingEquals", this.packagingEquals, true);
+		toStringHelper(buf, "artifactIdEquals", this.artifactIdEquals, true);
+		toStringHelper(buf, "groupIdEquals", this.groupIdEquals, true);
+		toStringHelper(buf, "versionEquals", this.versionEquals, true);
+		toStringHelper(buf, "classifierEquals", this.classifierEquals, true);
+		toStringHelper(buf, "noTestsFound", this.noTestsFound, true);
+		toStringHelper(buf, "activeProfileIdEquals", this.activeProfileIdEquals, true);
+		toStringHelper(buf, "artifactEquals", this.artifactEquals, false);
+
 		if (buf.charAt(buf.length() - 2) == ',') {
 			buf.deleteCharAt(buf.length() - 2);
 		}
-		buf.append("}");
-		return buf.toString();
+
+		return buf.append("}").toString();
+	}
+
+	private static void toStringHelper(StringBuilder buf, String propertyName, Object value, boolean addComma) {
+		if (value != null) {
+			buf.append(propertyName + "=");
+			buf.append(value);
+			if (addComma) {
+				buf.append(", ");
+			}
+		}
 	}
 
 }

@@ -10,6 +10,23 @@ import com.sample.ci.helper.model.SkipWhen;
 
 public class SkipWhenHelper {
 
+	protected enum BOOLEAN_EVAL {
+
+		NOT_PROCESSED, TRUE, FALSE;
+
+		public boolean isProcessed() {
+			return !NOT_PROCESSED.equals(this);
+		}
+		
+		public Boolean toBoolean() {
+			if (!isProcessed()) {
+				throw new IllegalStateException("cannot convert a non processed boolean value");
+			}
+			return TRUE.equals(this) ? Boolean.TRUE : Boolean.FALSE;
+		}
+
+	}
+	
 	protected Log log;
 
 	protected SkipWhen skipWhen;
@@ -47,6 +64,7 @@ public class SkipWhenHelper {
 
 		List<Boolean> skipList = this.retrieveSkipExpression();
 		if (skipList.isEmpty()) {
+			this.log.debug("No skipWhen conditions found.");
 			return false;
 		}
 
@@ -56,7 +74,7 @@ public class SkipWhenHelper {
 		}
 
 		boolean result = skipList.get(0);
-		if (SkipWhen.BOOLEAN_OPERATOR_AND.equals(this.skipWhen.getBooleanOperator())) {
+		if (SkipWhen.BooleanOperator.isOr(this.skipWhen.getBooleanOperator())) {
 			for (int i = 1; i < skipList.size(); i++) {
 				result = result && skipList.get(i);
 			}
@@ -66,12 +84,8 @@ public class SkipWhenHelper {
 			}
 		}
 
-		/*
-		 * TODO <classifierEquals>something</classifierEquals>
-		 * <noTestsFound>false</noTestsFound>
-		 * <activeProfileIdEquals>profile-id</activeProfileIdEquals>
-		 */
-
+		this.log.debug("Evaluation resulted in: "+result);
+		
 		return result;
 	}
 
@@ -86,20 +100,14 @@ public class SkipWhenHelper {
 				"artifactIdEquals", "artifactId"));
 		populateList(skipList, checkSingleValue(this.skipWhen.getVersionEquals(), this.project.getVersion(),
 				"versionEquals", "version"));
-		
+
 		return skipList;
 	}
 
-	private static void populateList(List<Boolean> list, int value) {
-		if (value != -1) {
-			list.add(value > 0 ? Boolean.TRUE : Boolean.FALSE);
-		}
-	}
-
-	public int checkSingleValue(String configurationEntry, String projectProperty, String configurationEntryName,
-			String projectEntryName) {
+	public BOOLEAN_EVAL checkSingleValue(String configurationEntry, String projectProperty,
+			String configurationEntryName, String projectEntryName) {
 		if (configurationEntry == null || configurationEntry.isEmpty()) {
-			return -1;
+			return BOOLEAN_EVAL.NOT_PROCESSED;
 		}
 		boolean negateFlag = false;
 		String checkAgainst = configurationEntry;
@@ -113,6 +121,12 @@ public class SkipWhenHelper {
 			this.log.info("skipWhen " + configurationEntryName + " condition met, " + projectEntryName + " equals to "
 					+ projectProperty + ", expected " + configurationEntry);
 		}
-		return result ? 1 : 0;
+		return result ? BOOLEAN_EVAL.TRUE : BOOLEAN_EVAL.FALSE;
+	}
+	
+	private static void populateList(List<Boolean> list, BOOLEAN_EVAL value) {
+		if (value.isProcessed()) {
+			list.add(value.toBoolean());
+		}
 	}
 }

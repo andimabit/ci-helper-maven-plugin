@@ -48,14 +48,14 @@ public class SkipWhenHelperTest {
 		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("pom").withGroupIdEquals("com.sample");
 		Assert.assertTrue(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 		
-		skipWhen.useBooleanOperator(SkipWhen.BOOLEAN_OPERATOR_AND);
+		skipWhen.useBooleanOperator(SkipWhen.BooleanOperator.AND);
 		Assert.assertTrue(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 	}
 
 	@Test
 	public void testWhenPackagingNotMatching() {
 		Mockito.when(this.project.getPackaging()).thenReturn("pom");
-		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("jar").useBooleanOperator(SkipWhen.BOOLEAN_OPERATOR_OR);
+		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("jar").useBooleanOperator(SkipWhen.BooleanOperator.OR);
 
 		Assert.assertFalse(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 	}
@@ -63,7 +63,7 @@ public class SkipWhenHelperTest {
 	@Test
 	public void testWhenPackagingNegateMatching() {
 		Mockito.when(this.project.getPackaging()).thenReturn("pom");
-		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("!pom").useBooleanOperator(SkipWhen.BOOLEAN_OPERATOR_OR);
+		SkipWhen skipWhen = new SkipWhen().withPackagingEquals("!pom").useBooleanOperator(SkipWhen.BooleanOperator.OR);
 
 		Assert.assertFalse(this.helper.forSkipWhen(skipWhen).skipWhenMet());
 
