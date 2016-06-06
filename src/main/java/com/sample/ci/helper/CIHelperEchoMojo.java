@@ -1,6 +1,10 @@
 package com.sample.ci.helper;
 
+import java.util.List;
 import java.util.Objects;
+
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -37,7 +41,7 @@ public class CIHelperEchoMojo extends AbstractMojo {
 	/**
 	 * The maven project.
 	 */
-	@Parameter(defaultValue = "${project}", required = true, readonly = true)
+	@Parameter(defaultValue = "${project}", required = true, readonly = false)
 	protected MavenProject project;
 
 	/**
@@ -54,12 +58,30 @@ public class CIHelperEchoMojo extends AbstractMojo {
 
 	@Parameter(property = "useLog", required = false, defaultValue = "false")
 	protected String useLog;
-	
+
 	protected SkipWhenHelper skipHelper = new SkipWhenHelper();
 
 	public void execute() throws MojoExecutionException {
-		this.skipHelper.usingLog(getLog()).forProject(this.project).forSkipWhen(this.skipWhen);
+		if (this.project.getBuild() != null) {
+			List<Plugin> plugins = this.project.getBuild().getPlugins();
+			for (Plugin p : plugins) {
+				getLog().info("on plugin "+p.getArtifactId());
+				List<PluginExecution> executions = p.getExecutions();
+				if (executions != null) {
+					for (PluginExecution e : executions) {
+						getLog().info("\ton execution "+e.getId());
+						if ("maven-jar-plugin".equals(p.getArtifactId())) {
+							if ("test-id".equals(e.getId())) {
+								e.setPhase("skipped");
+							}
+						}
+					}
+				}
+			}
+		}
 		
+		this.skipHelper.usingLog(getLog()).forProject(this.project).forSkipWhen(this.skipWhen);
+
 		getLog().debug("skipWen configuration: " + Objects.toString(this.skipWhen));
 
 		if (this.skipHelper.skipWhenMet()) {

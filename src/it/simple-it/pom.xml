@@ -38,17 +38,30 @@
 								<classifierEquals>something</classifierEquals>
 								<noTestsFound>false</noTestsFound>
 								<activeProfileIdEquals>profile-id</activeProfileIdEquals>
-								<artifact>com.sample:module1:*:*</artifact>
+								<artifactEquals>com.sample:module1:*:*</artifactEquals>
 								<booleanOperator>or</booleanOperator>
-								<awalys>false</awalys>
+								<always>false</always>
 							</skipWhen>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>test-id</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-	
+
 	<modules>
 		<module>module1</module>
 	</modules>

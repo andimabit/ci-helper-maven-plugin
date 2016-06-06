@@ -38,6 +38,8 @@ public class SkipWhen {
 	private String artifactEquals;
 
 	private String booleanOperator = BooleanOperator.OR.name();
+	
+	private Boolean always;
 
 	public SkipWhen withPackagingEquals(String packagingEquals) {
 		this.packagingEquals = packagingEquals;
@@ -91,6 +93,11 @@ public class SkipWhen {
 		this.booleanOperator = booleanOperator;
 		return this;
 	}
+	
+	public SkipWhen skipAlways() {
+		this.always = Boolean.TRUE;
+		return this;
+	}
 
 	public String getPackagingEquals() {
 		return packagingEquals;
@@ -126,6 +133,10 @@ public class SkipWhen {
 
 	public String getBooleanOperator() {
 		return booleanOperator;
+	}
+	
+	public Boolean getAlways() {
+		return always;
 	}
 
 	@Override

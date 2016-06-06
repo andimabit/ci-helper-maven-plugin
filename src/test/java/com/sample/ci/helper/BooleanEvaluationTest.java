@@ -3,8 +3,6 @@ package com.sample.ci.helper;
 import org.junit.Assert;
 import org.junit.Test;
 
-
-
 public class BooleanEvaluationTest {
 
 	@Test
