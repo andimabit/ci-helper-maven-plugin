@@ -30,6 +30,16 @@ abstract class AbstractSkipWhenHelperSupport {
 		    }
 		}).when(this.log).info(Mockito.any(String.class));
 		
+		Mockito.doAnswer(new Answer<Void>() {
+		    public Void answer(InvocationOnMock invocation) {
+		      Object[] args = invocation.getArguments();
+		      System.out.println("[DEBUG] "+Arrays.toString(args));
+		      return null;
+		    }
+		}).when(this.log).debug(Mockito.any(String.class));
+		
+		Mockito.when(log.isDebugEnabled()).thenReturn(Boolean.TRUE);
+		
 		this.helper = new SkipWhenHelper().forProject(this.project).usingLog(this.log);
 	}
 
