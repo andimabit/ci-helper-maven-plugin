@@ -103,7 +103,7 @@ public class SkipWhenHelper {
 
 		return skipList;
 	}
-
+	
 	public BOOLEAN_EVAL checkSingleValue(String configurationEntry, String projectProperty,
 			String configurationEntryName, String projectEntryName) {
 		if (configurationEntry == null || configurationEntry.isEmpty()) {

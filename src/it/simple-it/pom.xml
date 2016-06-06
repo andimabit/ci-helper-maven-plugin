@@ -38,7 +38,9 @@
 								<classifierEquals>something</classifierEquals>
 								<noTestsFound>false</noTestsFound>
 								<activeProfileIdEquals>profile-id</activeProfileIdEquals>
+								<artifact>com.sample:module1:*:*</artifact>
 								<booleanOperator>or</booleanOperator>
+								<awalys>false</awalys>
 							</skipWhen>
 						</configuration>
 					</execution>

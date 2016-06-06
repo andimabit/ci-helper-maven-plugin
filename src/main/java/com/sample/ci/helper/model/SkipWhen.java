@@ -31,7 +31,7 @@ public class SkipWhen {
 
 	private String classifierEquals;
 
-	private String noTestsFound;
+	private Boolean noTestsFound;
 
 	private String activeProfileIdEquals;
 
@@ -64,7 +64,7 @@ public class SkipWhen {
 		return this;
 	}
 
-	public SkipWhen withNoTestsFound(String noTestsFound) {
+	public SkipWhen withNoTestsFound(Boolean noTestsFound) {
 		this.noTestsFound = noTestsFound;
 		return this;
 	}
@@ -112,7 +112,7 @@ public class SkipWhen {
 		return classifierEquals;
 	}
 
-	public String getNoTestsFound() {
+	public Boolean getNoTestsFound() {
 		return noTestsFound;
 	}
 
